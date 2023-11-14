@@ -1,8 +1,16 @@
 import streamlit as st
 import time
 
-# Create a Streamlit web app
-st.set_page_config(page_title="Healify 🌿")  # Set the title to "Healify" and use a nature icon
+# Initialize session state variables
+if 'started_round2' not in st.session_state:
+    st.session_state.started_round2 = False
+if 'started_animation' not in st.session_state:
+    st.session_state.started_animation = False
+if 'form_submitted' not in st.session_state:
+    st.session_state.form_submitted = False
+
+# Set page configuration
+st.set_page_config(page_title="Healify 🌿")
 
 # Add a title to the home page
 st.title("Healify 🌿")
@@ -29,34 +37,23 @@ questions_round2 = [
     "Have you experienced any adverse reactions or triggers during previous therapy or discussions about trauma?"
 ]
 
-# Define a function to reset the session state
-def reset_session_state():
-    st.session_state.started_round2 = False
-    st.session_state.started_animation = False
-
-# Initialize session state
-if 'started_round2' not in st.session_state:
-    st.session_state.started_round2 = False
-if 'started_animation' not in st.session_state:
-    st.session_state.started_animation = False
-
 # Custom component to display the moving ball animation with sliding effect
 def moving_ball(speed=2):
     st.subheader("Ball Animation")
     animation_container = st.empty()
     positionX = 0
-    timeout = 100  # Set the timeout to 120 seconds
+    timeout = 3  # Set the timeout to 3 seconds
 
     start_time = time.time()
 
-    while st.session_state.started_animation:
+    while time.time() - start_time < timeout and not st.session_state.form_submitted:
         # Update the position of the ball
         positionX += speed
 
         # Display the animated ball
         animation_container.markdown(
             f'<div style="width: 800px; height: 300px; background: #333; position: relative; border-radius: 10px;">'
-            f'<div style="position: absolute; width: 40px; height: 40px; background-color: red; border-radius: 50%; left: {positionX}px; top: 130px;"></div>'
+            f'<div style="position: absolute; width: 40px; height: 40px; background-color: green; border-radius: 50%; left: {positionX}px; top: 130px;"></div>'
             f'</div>',
             unsafe_allow_html=True,
         )
@@ -70,9 +67,14 @@ def moving_ball(speed=2):
         if positionX <= 0:
             speed = abs(speed)
 
-        # Check if the timeout has been reached
-        if time.time() - start_time >= timeout:
-            break
+    # After animation
+    if not st.session_state.form_submitted:
+        with st.form(key='user_response_form'):
+            user_response = st.text_input("Type your response here:")
+            submit_button = st.form_submit_button(label='Submit')
+            if submit_button:
+                st.session_state.form_submitted = True
+                st.write("Thank you for your response!")
 
 # Display two buttons on the home page with larger sizes
 st.markdown(
@@ -189,6 +191,6 @@ if st.session_state.started_round2 and not st.session_state.started_animation:
 
 # Page 4: Ball Animation (placed after the second round of questions)
 if st.session_state.started_animation:
-    st.markdown("## Follow the Red Ball")
-    st.write("While focusing on the traumatic memory, follow the red ball. Describe any changes in your thoughts, emotions, or physical sensations as we do this.")
+    st.markdown("## Follow the Green Ball")
+    st.write("While focusing on the traumatic memory, follow the green ball. Describe any changes in your thoughts, emotions, or physical sensations as we do this.")
     moving_ball(5)
