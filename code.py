@@ -8,6 +8,8 @@ if 'started_animation' not in st.session_state:
     st.session_state.started_animation = False
 if 'form_submitted' not in st.session_state:
     st.session_state.form_submitted = False
+if 'animation_triggered' not in st.session_state:
+    st.session_state.animation_triggered = False
 
 # Set page configuration
 st.set_page_config(page_title="Healify 🌿")
@@ -186,11 +188,13 @@ if st.session_state.started_round2 and not st.session_state.started_animation:
     if st.button("Submit - Round 2", key="submit_round2"):
         st.session_state.started_animation = True
 
-# Page 4: Ball Animation (placed after the second round of questions)
-if st.session_state.started_animation:
+# Page 4: Ball Animation
+# The animation should only be triggered once after the second round of questions
+if st.session_state.started_animation and not st.session_state.animation_triggered:
     st.markdown("## Follow the Green Ball")
     st.write("While focusing on the traumatic memory, follow the green ball. Describe any changes in your thoughts, emotions, or physical sensations as we do this.")
     moving_ball(5)
+    st.session_state.animation_triggered = True  # Set this to True after the animation is done
 
 # Page 5: Form for user response after animation
 if st.session_state.started_round2 and st.session_state.started_animation and not st.session_state.form_submitted:
