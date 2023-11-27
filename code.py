@@ -42,11 +42,15 @@ def moving_ball(speed=2):
     st.subheader("Ball Animation")
     animation_container = st.empty()
     positionX = 0
-    timeout = 3  # Set the timeout to 3 seconds
+    animation_duration = 3  # Duration of the animation in seconds
 
+    # Wait for 7 seconds before starting the animation
+    time.sleep(7)
+
+    # Start counting the animation time from now
     start_time = time.time()
 
-    while time.time() - start_time < timeout and not st.session_state.form_submitted:
+    while time.time() - start_time < animation_duration and not st.session_state.form_submitted:
         # Update the position of the ball
         positionX += speed
 
@@ -67,14 +71,7 @@ def moving_ball(speed=2):
         if positionX <= 0:
             speed = abs(speed)
 
-    # After animation
-    if not st.session_state.form_submitted:
-        with st.form(key='user_response_form'):
-            user_response = st.text_input("Type your response here:")
-            submit_button = st.form_submit_button(label='Submit')
-            if submit_button:
-                st.session_state.form_submitted = True
-                st.write("Thank you for your response!")
+
 
 # Display two buttons on the home page with larger sizes
 st.markdown(
@@ -194,3 +191,13 @@ if st.session_state.started_animation:
     st.markdown("## Follow the Green Ball")
     st.write("While focusing on the traumatic memory, follow the green ball. Describe any changes in your thoughts, emotions, or physical sensations as we do this.")
     moving_ball(5)
+
+# Page 5: Form for user response after animation
+if st.session_state.started_round2 and st.session_state.started_animation and not st.session_state.form_submitted:
+    st.markdown("## Reflection")
+    with st.form(key='user_response_form'):
+        user_response = st.text_input("What positive thoughts or beliefs would you like to adopt to replace the negative associations tied to this memory?")
+        submit_button = st.form_submit_button(label='Submit')
+        if submit_button:
+            st.session_state.form_submitted = True
+            st.success("Thank you for your response!")
